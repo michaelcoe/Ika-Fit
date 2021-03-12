@@ -3,9 +3,9 @@ import cv2 as cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import Scripts.surfaceAreaEstimators as sae
-import Scripts.fishUtilities as fu
-import Scripts.fishFits as ff
+import surfaceAreaEstimators as sae
+import fishUtilities as fu
+import fishFits as ff
 from scipy import stats
 from scipy.optimize import curve_fit
 from scipy.stats.distributions import  t
@@ -13,7 +13,6 @@ from scipy.stats.distributions import  t
 def get_data(imagePath, specimen):
     imagePathTop = fu.get_image_files(imagePath, specimen+'Top.jpg')
     imagePathSide = fu.get_image_files(imagePath, specimen+'SideNF.jpg')
-    imagePathCS = fu.get_image_files(imagePath, specimen+'CS.jpg')
     imagePathSideFull = fu.get_image_files(imagePath, specimen+'Side.jpg')
     
     # import images
@@ -117,11 +116,7 @@ def fit_data(x, y, p0, dx):
 def main():
     homeImagePath = r'./Pictures'
     homeFigurePath = r'./'
-    homeDatabasePath = r'C:\Users\micha\Dropbox\UUV Project\Databases'
-    # UniFilePaths
-    uniFigurePath = r'D:\Dropbox\Journal Articles\Surface area and COT\figures'
-    uniDatabasePath = r'D:\Dropbox\UUV Project\Databases'
-    uniImagePath = r'D:\Dropbox\UUV Project\Pictures'
+    homeDatabasePath = r'./'
     
     database = r'osheaData.xlsx'
     dataPath = os.path.join(uniDatabasePath, database)

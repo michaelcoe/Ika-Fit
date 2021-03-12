@@ -59,14 +59,11 @@ def surface_area_angulliform(xu, topPolySide, bottomPolySide, heightWidthRatio, 
     topPointsTop = np.divide(topPointsSide+bottomPointsSide, heightWidthRatio*2)
     # distance between each circumference
     t = (xu[1]-xu[0])
-    # calculate the eccentricity of the top and bottom
-    eSquaredTop = 1.0 - np.divide(np.power(topPointsSide, 2), np.power(topPointsTop, 2))
-    eSquaredBottom = 1.0 - np.divide(np.power(bottomPointsSide, 2), np.power(topPointsTop, 2))
-    # calculate the surface area based on circumference and thickness
-    topArea = np.sum(np.multiply(np.multiply(topPointsTop, ellipe(eSquaredTop)),t))
-    bottomArea = np.sum(np.multiply(np.multiply(topPointsTop, ellipe(eSquaredBottom)),t))
-    # combine to get surface area of one side and multiple by 2 for total surface area    
-    return 2.0*(topArea+bottomArea)
+    # calculate the volume based on circumference and thickness
+    topVolume = np.sum(np.pi * t/2 * np.multiply(topPointsTop, topPointsSide))
+    bottomVolume = np.sum(np.pi * t/2 * np.multiply(topPointsTop, bottomPointsSide))
+    # combine the two volumes  
+    return (topVolume + bottomVolume)
 
 def surface_area_fusiform(topPolySide, bottomPolySide, xu, yu, length):
     # scale top and bottom values by length
@@ -77,18 +74,11 @@ def surface_area_fusiform(topPolySide, bottomPolySide, xu, yu, length):
     yu = yu[1:]*length
     # distance between each circumference
     t = (xu[1]-xu[0])
-    # calculate the eccentricity of the top and bottom
-    #eSquaredTop = 1.0 - np.divide(np.power(yu,2), np.power(topPointsSide,2))
-    #eSquaredBottom = 1.0 - np.divide(np.power(yu,2), np.power(bottomPointsSide,2))
-    eSquaredTop = 1.0 - np.divide(np.power(topPointsSide,2),np.power(yu,2))
-    eSquaredBottom = 1.0 - np.divide(np.power(bottomPointsSide,2), np.power(yu,2))
-    # calculate 1/4 of the circumference representing one side of the fish
-    #topArea = np.sum(np.multiply(topPointsSide, ellipe(eSquaredTop)))*t
-    #bottomArea = np.sum(np.multiply(bottomPointsSide, ellipe(eSquaredBottom)))*t
-    topArea = np.sum(np.multiply(yu, ellipe(eSquaredTop)))*t
-    bottomArea = np.sum(np.multiply(yu, ellipe(eSquaredBottom)))*t
-    # combine to get surface area of one side and multiple by 2 for total surface area    
-    return 2.0*(topArea+bottomArea)
+    # calculate the volume based on circumference and thickness
+    topVolume = np.sum(np.pi * t/2 * np.multiply(yu, topPointsSide))
+    bottomVolume = np.sum(np.pi * t/2 * np.multiply(yu, bottomPointsSide))
+    # combine the two volumes   
+    return (topVolume + bottomVolume)
 
 def surface_area_skate(topPolySide, bottomPolySide, xu, yu, length):
     # scale top and bottom values by length
@@ -98,18 +88,12 @@ def surface_area_skate(topPolySide, bottomPolySide, xu, yu, length):
     yu = yu*length
     # Thickness of the frustrums
     t = (xu[1]-xu[0])
-    # find the area of the Side contour which is the top of the fish
-    topArea = integrate.simps(topPointsSide, xu)
-    bottomArea = integrate.simps(bottomPointsSide, xu)
-    # calculate the eccentricity of the top and bottom
     # note that skates are the inverse of the fusilform body
-    eSquaredTop = 1.0 - np.divide(np.power(topPointsSide,2), np.power(yu,2),)
-    eSquaredBottom = 1.0 - np.divide(np.power(bottomPointsSide,2), np.power(yu,2))
-    # calculate 1/4 of the circumference representing one side of the fish
-    topArea = np.sum(np.multiply(np.multiply(yu, ellipe(eSquaredTop)),t))
-    bottomArea = np.sum(np.multiply(np.multiply(yu, ellipe(eSquaredBottom)),t))
-        
-    return 2.0*(topArea+bottomArea)
+    # calculate the volume based on circumference and thickness
+    topVolume = np.sum(np.pi * t/2 * np.multiply(yu, topPointsSide))
+    bottomVolume = np.sum(np.pi * t/2 * np.multiply(yu, bottomPointsSide))
+    # combine the two volumes 
+    return (topVolume + bottomVolume)
 
 def surface_area_invertedTeardrop(topPolySide, bottomPolySide, xu, yu, length):
     # scale top and bottom values by length
@@ -126,22 +110,16 @@ def surface_area_invertedTeardrop(topPolySide, bottomPolySide, xu, yu, length):
     # Calculate the area of the inverted teardrop portion of the fish (first 2/3)
     # Side of the triangle is sqrt(a^2 + b^2)
     # top portion is an ellipse and bottom portion is a triangle
-    eSquaredTop = 1.0 - np.divide(np.power(yu[1:firstIndex], 2), np.power(topPointsSide[1:firstIndex], 2))
-    topEllipseArea = np.sum(np.multiply(np.multiply(topPointsSide[1:firstIndex], ellipe(eSquaredTop)),t))
+    topEllipseVolume = np.sum(np.pi * t/2 * np.multiply(yu[0:firstIndex], topPointsSide[0:firstIndex]))
     # cross section is flattened at the bottom, assume that around 5 percent of the triangle side will fold over to make flattened bottom
-    bottomTriangleArea = np.sum(np.multiply(np.power(bottomPointsSide[0:firstIndex]+(bottomPointsSide[0:firstIndex]*0.05),2)+
-                                            np.power(yu[0:firstIndex],2),t))
+    bottomTriangleVolume = np.sum(np.pi * t/2 * np.multiply(yu[0:firstIndex], topPointsSide[0:firstIndex]))
     #-------------------------------------------------------
     # calculate the area of the ellipse portion of the fish (last 1/3)
-    # calculate the eccentricity of the top and bottom
-    eSquaredTop = 1.0 - np.divide(np.power(yu[lastIndex:-1], 2), np.power(topPointsSide[lastIndex:-1], 2))
-    eSquaredBottom = 1.0 - np.divide(np.power(yu[lastIndex:-1], 2), np.power(bottomPointsSide[lastIndex:-1], 2))
-    # calculate 1/4 of the circumference representing one side of the fish
-    topTailArea = np.sum(np.multiply(np.multiply(topPointsSide[lastIndex:-1], ellipe(eSquaredTop)),t))
-    bottomTailArea= np.sum(np.multiply(np.multiply(bottomPointsSide[lastIndex:-1], ellipe(eSquaredBottom)),t))
-    # calculate the surface area based on circumference and thickness
+     # calculate the volume based on circumference and thickness
+    topTailVolume = np.sum(np.pi * t/2 * np.multiply(yu[lastIndex:-1], topPointsSide[lastIndex:-1]))
+    bottomTailVolume = np.sum(np.pi * t/2 * np.multiply(yu[lastIndex:-1], bottomPointsSide[lastIndex:-1]))
          
-    return 2.0*(topEllipseArea+bottomTriangleArea+topTailArea+bottomTailArea)
+    return (topEllipseVolume + bottomTriangleVolume + topTailVolume + bottomTailVolume)
 
 def surface_area_teardrop(topPolySide, bottomPolySide, xu, yu, length):
     # scale top and bottom values by length
@@ -159,21 +137,16 @@ def surface_area_teardrop(topPolySide, bottomPolySide, xu, yu, length):
     # Side of the triangle is sqrt(a^2 + b^2)
     # bottom portion is an ellipse and top portion is a triangle
     # cross section is flattened at the bottom, assume that around 5 percent of the triangle side will fold over to make flattened bottom
-    topTriangleArea = np.sum(np.multiply(np.power(yu[0:firstIndex]+(topPointsSide[0:firstIndex]*0.05),2)+np.power(yu[0:firstIndex],2),t))
+    topTriangleArea = np.sum(np.pi * t/2 * np.multiply(yu[0:firstIndex], topPointsSide[0:firstIndex]))
     # bottom Ellipse
-    eSquaredBottom = 1.0 - np.divide(np.power(yu[0:firstIndex], 2), np.power(bottomPointsSide[0:firstIndex], 2))
-    bottomEllipseArea = np.sum(np.multiply(np.multiply(bottomPointsSide[0:firstIndex], ellipe(eSquaredBottom)),t))
+    bottomEllipseArea = np.sum(np.pi * t/2 * np.multiply(yu[0:firstIndex], bottomPointsSide[0:firstIndex]))
     #-------------------------------------------------------
-    # calculate the area of the ellipse portion of the fish (last 1/3)
-    # calculate the eccentricity of the top and bottom
-    eSquaredTop = 1.0 - np.divide(np.power(yu[lastIndex:-1], 2), np.power(topPointsSide[lastIndex:-1], 2))
-    eSquaredBottom = 1.0 - np.divide(np.power(yu[lastIndex:-1], 2), np.power(bottomPointsSide[lastIndex:-1], 2))
     # calculate 1/4 of the circumference representing one side of the fish
-    topTailArea = np.sum(np.multiply(np.multiply(topPointsSide[lastIndex:-1], ellipe(eSquaredTop)),t))
-    bottomTailArea= np.sum(np.multiply(np.multiply(bottomPointsSide[lastIndex:-1], ellipe(eSquaredBottom)),t))
+    topTailArea = np.sum(np.pi * t/2 * np.mulitply(yu[lastIndex:-1], topPointsSide[lastIndex:-1]))
+    bottomTailArea= np.sum(np.pi * t/2 * np.multiply(yu[lastIndex:-1], bottomPointsSide[lastIndex:-1]))
     # calculate the surface area based on circumference and thickness
          
-    return 2.0*(bottomEllipseArea+topTriangleArea+topTailArea+bottomTailArea)
+    return (bottomEllipseArea+topTriangleArea+topTailArea+bottomTailArea)
 
 def surface_area_oval(dx, topPolySide, bottomPolySide, topPolyTop, bottomPolyTop, length):
     # scale top and bottom values by length
@@ -209,19 +182,14 @@ def surface_area_box(topPolySide, bottomPolySide, xu, yu, length):
     lastIndex = len(xu)-int(len(xu)*1/3)
     #--------------------------------------------------------
     # Calculate the area of the box portion of the fish (first 2/3)
-    topBoxArea = np.sum(np.multiply(topPointsTop[0:firstIndex]+topPointsSide[0:firstIndex],t))
-    bottomBoxArea = np.sum(np.multiply(topPointsTop[0:firstIndex]+bottomPointsSide[0:firstIndex],t))
+    topBoxArea = np.sum(2 * t * np.multiply(topPointsTop[0:firstIndex], topPointsSide[0:firstIndex]))
+    bottomBoxArea = np.sum(2 * t * np.multiply(topPointsTop[0:firstIndex], bottomPointsSide[0:firstIndex]))
     #-------------------------------------------------------
-    # calculate the area of the ellipse portion of the fish (last 1/3)
-    # calculate the eccentricity of the top and bottom
-    eSquaredTop = 1.0 - np.divide(np.power(topPointsTop[lastIndex:-1], 2), np.power(topPointsSide[lastIndex:-1], 2))
-    eSquaredBottom = 1.0 - np.divide(np.power(topPointsTop[lastIndex:-1], 2), np.power(bottomPointsSide[lastIndex:-1], 2))
-    # calculate 1/4 of the circumference representing one side of the fish
     # calculate the surface area based on circumference and thickness
-    topTailArea = np.sum(np.multiply(np.multiply(topPointsSide[lastIndex:-1], ellipe(eSquaredTop)),t))
-    bottomTailArea= np.sum(np.multiply(np.multiply(bottomPointsSide[lastIndex:-1], ellipe(eSquaredBottom)),t))
+    topTailArea = np.sum(np.pi * t * np.multiply(topPointsSide[lastIndex:-1], ellipe(eSquaredTop)))
+    bottomTailArea= np.sum(np.pi * t * np.multiply(bottomPointsSide[lastIndex:-1], ellipe(eSquaredBottom)))
          
-    return 2.0*(topBoxArea+bottomBoxArea+topTailArea+bottomTailArea)
+    return topBoxArea+bottomBoxArea+topTailArea+bottomTailArea
 
 def surface_area_triangle(topPolySide, bottomPolySide, xu, yu, length):
     # scale top and bottom values by length
@@ -254,32 +222,15 @@ def surface_area_triangle(topPolySide, bottomPolySide, xu, yu, length):
 def equivalentSpheroid(length, mass, fluidDensity):
     # Equivalent Diameter
     D_s = np.sqrt(np.divide(6*mass,fluidDensity*np.pi*length))
-    # ellipsicity
-    ellipsicity = np.sqrt(1-np.divide(np.square(D_s), np.square(length)))
-    # Equivalent surface area
-    A_s = 2*np.pi*np.power(D_s,2)/4 + 2*np.pi*np.multiply(np.divide(np.multiply(D_s, length),4*ellipsicity), np.arcsin(ellipsicity))
-    # Slenderness Ratio
-    S_r = np.divide(length, D_s)
-    # Geometric constant for length
-    # slenderness ratio
-    slenderness = np.divide(length, D_s)
-    c = np.power(np.divide(np.multiply(6, np.power(S_r,2)), np.multiply(fluidDensity, np.pi)), 1/3)
-    calcLength = c*np.power(mass, 1/3)
-    newSr = np.divide(calcLength, D_s)
-    # Geometric constant for surface area
-    d = np.power(np.divide(1,fluidDensity),2/3)*(-0.0122*np.power(slenderness,2)+0.5196*slenderness+4.2732)
-    A_sr = np.multiply(d, np.power(mass, 2/3))
-    
-    return D_s, A_s, calcLength, A_sr, S_r
+    # volume of spheroid    
+    return (4*np.pi/3) * np.power(D_s/2, 2) * length/2
 
 def ellipsoidApproximation(length, width, thickness):
     a = length/2
     b = width/2
     c = thickness/2
-    
-    eccentricity = np.sqrt(1-np.divide(b**2, a**2))
-    
-    return 2*np.pi*b**2 + 2*np.pi*np.divide(a*b,eccentricity)*np.arcsin(eccentricity)
+                              
+    return 4*np.pi/3*np.power(b, 2) * a
 
 def partitionDisc(length, topCoeffSide, bottomCoeffSide, topCoeffTop, bottomCoeffTop):
     dx = np.linspace(0.0, 1.0, 100)
@@ -301,9 +252,9 @@ def partitionDisc(length, topCoeffSide, bottomCoeffSide, topCoeffTop, bottomCoef
     b = height/2
     a = width/2
     
-    estArea = np.zeros(len(dx))
+    estVolume = np.zeros(len(dx))
     
-    for i in range(len(estArea)-1):
-        estArea[i] = (((b[i]+a[i])+(b[i+1]+a[i+1]))/2)*t*np.pi
+    for i in range(len(estVolume)-1):
+        estVolume[i] = np.pi * t * a[i] * b[i]
         
-    return np.sum(estArea)
+    return np.sum(estVolume)
