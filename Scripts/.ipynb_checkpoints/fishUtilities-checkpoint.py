@@ -1,10 +1,9 @@
-import os
 import math
 import cv2 as cv2
 import numpy as np
 from scipy import integrate
 from scipy.special import ellipe
-
+from pathlib import Path
 #----- Method List -----------------------
 # list of images = get_image_files(imagePath, fileName)
 # image = kmeans_color_quantization(image, clusters, rounds)
@@ -21,11 +20,8 @@ from scipy.special import ellipe
 
 def get_image_files(imagePath, fileName):
     imageFiles = []
-
-    for root, dirs, files in os.walk(imagePath):
-        for file in files:
-            if file.endswith(fileName):
-                imageFiles.append(os.path.join(root, file))
+    for path in Path(imagePath).rglob('**/'+fileName):
+        imageFiles.append(path)
                 
     return imageFiles
 

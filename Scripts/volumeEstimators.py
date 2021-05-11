@@ -4,19 +4,19 @@ from scipy import integrate
 from scipy.special import ellipe
 
 #-------------Method List----------------------------
-# determine_surface_area(topForm, crossSection, aspectRatio, length, topCoeffSide, bottomCoeffSide, topCoeffTop, bottomCoeffTop)
-# surface_area_angulliform(xu, topPolySide, bottomPolySide, heightWidthRatio, length)
-# surface_area_fusiform(topPolySide, bottomPolySide, xu, yu, length)
-# surface_area_skate(topPolySide, bottomPolySide, xu, yu, length)
-# surface_area_invertedTeardrop(topPolySide, bottomPolySide, xu, yu, length)
-# surface_area_teardrop(topPolySide, bottomPolySide, xu, yu, length)
-# surface_area_oval(topPolySide, bottomPolySide, xu, yu, length)
-# surface_area_box(topPolySide, bottomPolySide, xu, yu, length)
-# surface_area_triangle(topPolySide, bottomPolySide, xu, yu, length)
+# determine_volume(topForm, crossSection, aspectRatio, length, topCoeffSide, bottomCoeffSide, topCoeffTop, bottomCoeffTop)
+# volume_angulliform(xu, topPolySide, bottomPolySide, heightWidthRatio, length)
+# volume_fusiform(topPolySide, bottomPolySide, xu, yu, length)
+# volume_skate(topPolySide, bottomPolySide, xu, yu, length)
+# volume_invertedTeardrop(topPolySide, bottomPolySide, xu, yu, length)
+# volume_teardrop(topPolySide, bottomPolySide, xu, yu, length)
+# volume_oval(topPolySide, bottomPolySide, xu, yu, length)
+# volume_box(topPolySide, bottomPolySide, xu, yu, length)
+# volume_triangle(topPolySide, bottomPolySide, xu, yu, length)
 # equivalentSpheroid(length, mass, fluidDensity)
 #------------------------------------------------------
 
-def determine_surface_area(topForm, crossSection, aspectRatio, length, topCoeffSide, bottomCoeffSide, topCoeffTop, bottomCoeffTop):
+def determine_volume(topForm, crossSection, aspectRatio, length, topCoeffSide, bottomCoeffSide, topCoeffTop, bottomCoeffTop):
     dx = np.linspace(0.0, 1.0, 100)
     # determine if airfoil or not
     if(topForm):
@@ -25,8 +25,8 @@ def determine_surface_area(topForm, crossSection, aspectRatio, length, topCoeffS
         # Naca Airfoil equation (x, camber height, location of max thickness,
         # max thickness, chord length, last coefficient of equation)
         X, Y = af.naca4_modified(dx, topCoeffTop[0], topCoeffTop[1], 1.0, topCoeffTop[2])
-        xu = np.asarray(X[0])
-        yu = np.asarray(Y[0])   
+        xu = X[0]
+        yu = Y[0]  
     else:
         topPolySide = np.poly1d(topCoeffSide)
         bottomPolySide = np.poly1d(bottomCoeffSide) 
@@ -36,23 +36,23 @@ def determine_surface_area(topForm, crossSection, aspectRatio, length, topCoeffS
         yu= topPolyTop(dx)
     # if else statement for the cross section 
     if(crossSection==1):
-        return surface_area_angulliform(xu, topPolySide, bottomPolySide, aspectRatio, length)
+        return volume_angulliform(xu, topPolySide, bottomPolySide, aspectRatio, length)
     elif(crossSection==2):
-        return surface_area_fusiform(topPolySide, bottomPolySide, xu, yu, length)
+        return volume_fusiform(topPolySide, bottomPolySide, xu, yu, length)
     elif(crossSection==3):
-        return surface_area_skate(topPolySide, bottomPolySide, xu, yu, length)
+        return volume_skate(topPolySide, bottomPolySide, xu, yu, length)
     elif(crossSection==4):
-        return surface_area_invertedTeardrop(topPolySide, bottomPolySide, xu, yu, length)
+        return volume_invertedTeardrop(topPolySide, bottomPolySide, xu, yu, length)
     elif(crossSection==5):
-        return surface_area_teardrop(topPolySide, bottomPolySide, xu, yu, length)
+        return volume_teardrop(topPolySide, bottomPolySide, xu, yu, length)
     elif(crossSection==6):
-        return surface_area_oval(topPolySide, bottomPolySide, xu, yu, length)
+        return volume_oval(topPolySide, bottomPolySide, xu, yu, length)
     elif(crossSection==7):
-        return surface_area_box(topPolySide, bottomPolySide, xu, yu, length)
+        return volume_box(topPolySide, bottomPolySide, xu, yu, length)
     else:
-        return surface_area_triangle(topPolySide, bottomPolySide, xu, yu, length)
+        return volume_triangle(topPolySide, bottomPolySide, xu, yu, length)
 
-def surface_area_angulliform(xu, topPolySide, bottomPolySide, heightWidthRatio, length):
+def volume_angulliform(xu, topPolySide, bottomPolySide, heightWidthRatio, length):
     # scale top and bottom values by length
     topPointsSide = np.abs(topPolySide(xu))*length
     bottomPointsSide = np.abs(bottomPolySide(xu))*length
@@ -65,7 +65,7 @@ def surface_area_angulliform(xu, topPolySide, bottomPolySide, heightWidthRatio, 
     # combine the two volumes  
     return (topVolume + bottomVolume)
 
-def surface_area_fusiform(topPolySide, bottomPolySide, xu, yu, length):
+def volume_fusiform(topPolySide, bottomPolySide, xu, yu, length):
     # scale top and bottom values by length
     # surface area sums up the N-2 frustrums
     topPointsSide = np.abs(topPolySide(xu[1:]))*length
@@ -80,7 +80,7 @@ def surface_area_fusiform(topPolySide, bottomPolySide, xu, yu, length):
     # combine the two volumes   
     return (topVolume + bottomVolume)
 
-def surface_area_skate(topPolySide, bottomPolySide, xu, yu, length):
+def volume_skate(topPolySide, bottomPolySide, xu, yu, length):
     # scale top and bottom values by length
     topPointsSide = np.abs(topPolySide(xu))*length
     bottomPointsSide = np.abs(bottomPolySide(xu))*length
@@ -95,7 +95,7 @@ def surface_area_skate(topPolySide, bottomPolySide, xu, yu, length):
     # combine the two volumes 
     return (topVolume + bottomVolume)
 
-def surface_area_invertedTeardrop(topPolySide, bottomPolySide, xu, yu, length):
+def volume_invertedTeardrop(topPolySide, bottomPolySide, xu, yu, length):
     # scale top and bottom values by length
     topPointsSide = np.abs(topPolySide(xu))*length
     bottomPointsSide = np.abs(bottomPolySide(xu))*length
@@ -121,7 +121,7 @@ def surface_area_invertedTeardrop(topPolySide, bottomPolySide, xu, yu, length):
          
     return (topEllipseVolume + bottomTriangleVolume + topTailVolume + bottomTailVolume)
 
-def surface_area_teardrop(topPolySide, bottomPolySide, xu, yu, length):
+def volume_teardrop(topPolySide, bottomPolySide, xu, yu, length):
     # scale top and bottom values by length
     topPointsSide = np.abs(topPolySide(xu))*length
     bottomPointsSide = np.abs(bottomPolySide(xu))*length
@@ -148,7 +148,7 @@ def surface_area_teardrop(topPolySide, bottomPolySide, xu, yu, length):
          
     return (bottomEllipseArea+topTriangleArea+topTailArea+bottomTailArea)
 
-def surface_area_oval(dx, topPolySide, bottomPolySide, topPolyTop, bottomPolyTop, length):
+def volume_oval(dx, topPolySide, bottomPolySide, topPolyTop, bottomPolyTop, length):
     # scale top and bottom values by length
     topPointsSide = np.abs(topPolySide(dx))*length
     bottomPointsSide = np.abs(bottomPolySide(dx))*length
@@ -170,7 +170,7 @@ def surface_area_oval(dx, topPolySide, bottomPolySide, topPolyTop, bottomPolyTop
     # combine to get surface area of one side and multiple by 2 for total surface area    
     return topAreaRight+bottomAreaRight+topAreaLeft+bottomAreaLeft
 
-def surface_area_box(topPolySide, bottomPolySide, xu, yu, length):
+def volume_box(topPolySide, bottomPolySide, xu, yu, length):
     # scale top and bottom values by length
     topPointsSide = np.abs(topPolySide(xu))*length
     bottomPointsSide = np.abs(bottomPolySide(xu))*length
@@ -191,7 +191,7 @@ def surface_area_box(topPolySide, bottomPolySide, xu, yu, length):
          
     return topBoxArea+bottomBoxArea+topTailArea+bottomTailArea
 
-def surface_area_triangle(topPolySide, bottomPolySide, xu, yu, length):
+def volume_triangle(topPolySide, bottomPolySide, xu, yu, length):
     # scale top and bottom values by length
     topPointsSide = np.abs(topPolySide(xu))*length
     bottomPointsSide = np.abs(bottomPolySide(xu))*length

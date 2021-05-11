@@ -25,8 +25,8 @@ def determine_surface_area(topForm, crossSection, aspectRatio, length, topCoeffS
         # Naca Airfoil equation (x, camber height, location of max thickness,
         # max thickness, chord length, last coefficient of equation)
         X, Y = af.naca4_modified(dx, topCoeffTop[0], topCoeffTop[1], 1.0, topCoeffTop[2])
-        xu = np.asarray(X[0])
-        yu = np.asarray(Y[0])   
+        xu = X[0]
+        yu = Y[0]   
     else:
         topPolySide = np.poly1d(topCoeffSide)
         bottomPolySide = np.poly1d(bottomCoeffSide) 
@@ -77,6 +77,8 @@ def surface_area_fusiform(topPolySide, bottomPolySide, xu, yu, length):
     yu = yu[1:]*length
     # distance between each circumference
     t = (xu[1]-xu[0])
+    height = np.abs(topPointsSide) + np.abs(bottomPointsSide)
+    width = np.abs(2*yu) 
     # calculate the eccentricity of the top and bottom
     #eSquaredTop = 1.0 - np.divide(np.power(yu,2), np.power(topPointsSide,2))
     #eSquaredBottom = 1.0 - np.divide(np.power(yu,2), np.power(bottomPointsSide,2))
@@ -88,7 +90,7 @@ def surface_area_fusiform(topPolySide, bottomPolySide, xu, yu, length):
     topArea = np.sum(np.multiply(yu, ellipe(eSquaredTop)))*t
     bottomArea = np.sum(np.multiply(yu, ellipe(eSquaredBottom)))*t
     # combine to get surface area of one side and multiple by 2 for total surface area    
-    return 2.0*(topArea+bottomArea)
+    return 2.0*(topArea+bottomArea), np.max([height, width])
 
 def surface_area_skate(topPolySide, bottomPolySide, xu, yu, length):
     # scale top and bottom values by length
@@ -270,7 +272,7 @@ def equivalentSpheroid(length, mass, fluidDensity):
     d = np.power(np.divide(1,fluidDensity),2/3)*(-0.0122*np.power(slenderness,2)+0.5196*slenderness+4.2732)
     A_sr = np.multiply(d, np.power(mass, 2/3))
     
-    return D_s, A_s, calcLength, A_sr, S_r
+    return D_s, A_s, slenderness
 
 def ellipsoidApproximation(length, width, thickness):
     a = length/2
