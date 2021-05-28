@@ -278,9 +278,9 @@ def ellipsoidApproximation(length, width, thickness):
     a = length/2
     b = width/2
     c = thickness/2
-    
-    eccentricity = np.sqrt(1-np.divide(b**2, a**2))
-    
+
+    eccentricity = np.sqrt(1.0-np.divide(b**2, a**2))
+
     return 2*np.pi*b**2 + 2*np.pi*np.divide(a*b,eccentricity)*np.arcsin(eccentricity)
 
 def partitionDisc(length, topCoeffSide, bottomCoeffSide, topCoeffTop, bottomCoeffTop):
