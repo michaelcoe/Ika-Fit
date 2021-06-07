@@ -72,13 +72,15 @@ def volume_fusiform(topPolySide, bottomPolySide, xu, yu, length):
     bottomPointsSide = np.abs(bottomPolySide(xu[1:]))*length
     xu = xu[1:]*length
     yu = yu[1:]*length
+    height = np.max(np.abs(topPointsSide) + np.abs(bottomPointsSide))
+    width = np.max(np.abs(2*yu))
     # distance between each circumference
     t = (xu[1]-xu[0])
     # calculate the volume based on circumference and thickness
     topVolume = np.sum(np.pi * t/2 * np.multiply(yu, topPointsSide))
     bottomVolume = np.sum(np.pi * t/2 * np.multiply(yu, bottomPointsSide))
     # combine the two volumes   
-    return (topVolume + bottomVolume)
+    return (topVolume + bottomVolume), height, width
 
 def volume_skate(topPolySide, bottomPolySide, xu, yu, length):
     # scale top and bottom values by length
